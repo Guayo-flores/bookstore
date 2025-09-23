@@ -32,6 +32,7 @@ app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=is_prod,  # True in production (HTTPS)
     SESSION_COOKIE_SAMESITE="Lax",
+    WTF_CSRF_ENABLED=False,
 )
 
 # Where to save files relative to your project root
