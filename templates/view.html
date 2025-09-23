@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ book.title }} · Book Store</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .soft-shadow {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, .06);
+        }
+
+        .cover-lg {
+            width: 260px;
+            height: 360px;
+            object-fit: cover;
+            background: #f3f4f6;
+        }
+
+        .badge-chip {
+            border-radius: 999px;
+            border: 1px solid #dee2e6;
+            background: #fff;
+            padding: .35rem .65rem;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .badge-chip:hover {
+            background: #f8f9fa;
+        }
+
+        .line-clamp-2,
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .line-clamp-2 {
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+        }
+
+        .line-clamp-3 {
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+        }
+
+        .ellipsis-1 {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+
+<body>
+
+    {# =================== PATH HELPER MACROS =================== #}
+    {% macro cover_url(item) -%}
+    {%- set f = (item.cover or '') -%}
+    {%- if f and f.startswith('static/') -%}{%- set f = f[7:] -%}{%- endif -%}
+    {%- set rel = f if (f and f.startswith('uploads/')) else ('uploads/covers/' ~ f if f else '') -%}
+    {{ url_for('static', filename=rel) if rel else url_for('static', filename='img/placeholder_cover.png') }}
+    {%- endmacro %}
+    {% macro file_url(item) -%}
+    {%- set f = (item.file or '') -%}
+    {%- if f and f.startswith('static/') -%}{%- set f = f[7:] -%}{%- endif -%}
+    {%- set rel = f if (f and f.startswith('uploads/')) else ('uploads/files/' ~ f if f else '') -%}
+    {{ url_for('static', filename=rel) if rel else '#' }}
+    {%- endmacro %}
+
+    <!-- NAV -->
+    <div class="container">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{ url_for('index') }}">Book Store</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"
+                    aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div id="nav" class="collapse navbar-collapse">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('store') }}">Store</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Sign up</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <!-- FLASHES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="container mt-3">
+        {% for category, msg in messages %}
+        <div class="alert alert-{{ 'info' if category=='message' else category }} alert-dismissible fade show"
+            role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- BREADCRUMBS -->
+    <div class="container mt-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('store') }}">Store</a></li>
+                <li class="breadcrumb-item">
+                    <a href="{{ url_for('store', category_id=book.category_id) }}">{{ book.category }}</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">{{ book.title }}</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- BOOK TOP -->
+    <div class="container mt-2">
+        <div class="row g-4 align-items-start">
+            <div class="col-12 col-md-auto text-center">
+                <img src="{{ cover_url(book) }}" alt="{{ book.title }}" class="rounded soft-shadow cover-lg">
+            </div>
+            <div class="col">
+                <h1 class="h3 mb-1">{{ book.title }}</h1>
+                <div class="text-muted mb-2">by
+                    <a href="{{ url_for('store', q=book.author) }}" class="link-secondary">{{ book.author }}</a>
+                </div>
+                <div class="mb-3">
+                    <a class="badge-chip" href="{{ url_for('store', category_id=book.category_id) }}">
+                        {{ book.category }}
+                    </a>
+                </div>
+
+                {% if book.price is not none %}
+                <div class="h4 text-success mb-3">${{ '%.2f'|format(book.price|float) }}</div>
+                {% endif %}
+
+                {% if book.description %}
+                <p class="mb-3">{{ book.description }}</p>
+                {% else %}
+                <p class="text-muted">No description available.</p>
+                {% endif %}
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('store') }}" class="btn btn-primary">Back to Store</a>
+                    {% if book.file %}
+                    <a href="{{ file_url(book) }}" class="btn btn-outline-secondary" download>Download</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RELATED -->
+    <div class="container mt-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h2 class="h5 mb-0">Related books</h2>
+            <a href="{{ url_for('store', category_id=book.category_id) }}" class="btn btn-sm btn-outline-secondary">See
+                all in {{ book.category }}</a>
+        </div>
+
+        {% if related and related|length > 0 %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
+            {% for b in related %}
+            <div class="col">
+                <div class="card h-100 soft-shadow">
+                    <img src="{{ cover_url(b) }}" class="card-img-top" alt="{{ b.title }}">
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title mb-1 ellipsis-1" title="{{ b.title }}">{{ b.title }}</h6>
+                        <small class="text-muted mb-2 ellipsis-1" title="{{ b.author or '' }}">{{ b.author or '—'
+                            }}</small>
+                        {% if b.description %}
+                        <p class="card-text text-secondary small line-clamp-2" title="{{ b.description }}">{{
+                            b.description }}</p>
+                        {% endif %}
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold">
+                                {% if b.price is not none %}${{ '%.2f'|format(b.price|float) }}{% else %}—{% endif %}
+                            </span>
+                            <a href="{{ url_for('book_view', book_id=b.id) }}" class="btn btn-primary btn-sm">View</a>
+                        </div>
+                    </div>
+                    {% if b.category %}
+                    <div class="card-footer bg-white">
+                        <span class="badge text-bg-light">{{ b.category }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info">No related books yet.</div>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

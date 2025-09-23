@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Add Book</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+  {% from "_csrf.html" import field as csrf_field %}
+  <div class="container">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('admin') }}">Admin</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" href="{{ url_for('add_book') }}">Add Book</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('add_author') }}">Add Author</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('add_category') }}">Add Category</a>
+            </li>
+          </ul>
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <form action="{{ url_for('add_book') }}" method="post" enctype="multipart/form-data" class="shadow p-4 rounded mt-5"
+      style="width: 90%; max-width: 50rem;">
+      {{ csrf_field() }}
+      <h1 class="text-center pb-5 display-4 fs-3">Add New Book</h1>
+      <div class="mb-3">
+        <label class="form-label">Book Title</label>
+        <input type="text" class="form-control" name="book_title" required
+          oninvalid="this.setCustomValidity('Book title cannot be empty')" oninput="this.setCustomValidity('')">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Book Author</label>
+        <select name="author_id" class="form-select" required
+          oninvalid="this.setCustomValidity('Please select an author')" oninput="this.setCustomValidity('')">
+          <option value="">-- Select an author --</option>
+          {% for au in authors %}
+          <option value="{{ au.id }}">{{ au.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Book Description</label>
+        <input type="text" class="form-control" name="book_description" required
+          oninvalid="this.setCustomValidity('Book description cannot be empty')" oninput="this.setCustomValidity('')">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Book Category</label>
+        <select name="category_id" class="form-select" required
+          oninvalid="this.setCustomValidity('Please select a category')" oninput="this.setCustomValidity('')">
+          <option value="">-- Select a category --</option>
+          {% for cat in categories %}
+          <option value="{{ cat.id }}">{{ cat.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Book Price</label>
+        <input type="number" step="0.01" min="0" class="form-control" name="book_price"
+          oninvalid="this.setCustomValidity('Price must be a valid non-negative number')"
+          oninput="this.setCustomValidity('')">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Book Cover</label>
+        <input type="file" class="form-control" name="book_cover" required
+          oninvalid="this.setCustomValidity('Book cover cannot be empty')" oninput="this.setCustomValidity('')">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">File</label>
+        <input type="file" class="form-control" name="file" required
+          oninvalid="this.setCustomValidity('File cannot be empty')" oninput="this.setCustomValidity('')">
+      </div>
+      <button type="submit" class="btn btn-primary">Add Book</button>
+    </form>
+  </div>
+</body>
+
+</html>
