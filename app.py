@@ -700,6 +700,7 @@ def register():
         conn.commit()
         cur.close()
         conn.close()
+        flash("Account created successfully. Please log in.", "success")
         return redirect(url_for("login"))
 
     return render_template("register.html")
