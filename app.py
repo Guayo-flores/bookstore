@@ -21,10 +21,11 @@ from werkzeug.utils import secure_filename
 import itertools
 from flask_wtf import CSRFProtect
 from datetime import date
-from urllib.parse import urlparse
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "COUGS")
+
+csrf = CSRFProtect(app)
 
 is_prod = os.getenv("FLASK_ENV") == "production"
 app.config.update(
