@@ -84,11 +84,11 @@
             <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
           </ul>
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-              {% if session.get('user_id') %}
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('me') }}">My Wishlist</a>
-              </li>
-              {% endif %}
+            {% if session.get('user_id') %}
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('me') }}">My Wishlist</a>
+            </li>
+            {% endif %}
             <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
             <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Sign up</a></li>
           </ul>
@@ -183,6 +183,9 @@
         <p class="text-secondary">
           Every feature we ship aims to teach something new—database design, authentication, role-based admin,
           image uploads, and more.
+        </p>
+        <p class="text-secondary">
+          This bookstore project is for educational and demonstration purposes only.
         </p>
       </div>
       <div class="col-lg-7">

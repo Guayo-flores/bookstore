@@ -36,7 +36,10 @@
           </ul>
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+              <form action="{{ url_for('logout') }}" method="post" class="d-inline">
+                {% from "_csrf.html" import field as csrf_field %} {{ csrf_field() }}
+                <button type="submit" class="nav-link btn btn-link p-0">Logout</button>
+              </form>
             </li>
           </ul>
         </div>
